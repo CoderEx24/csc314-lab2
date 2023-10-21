@@ -11,4 +11,3 @@ pip install -r requirements.txt
 
 3- run `main.py`
 
-

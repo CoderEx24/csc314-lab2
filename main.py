@@ -15,7 +15,7 @@ model = AutoModelForCausalLM.from_pretrained(
 def get_bot_response(text: str, dispatcher: EventDispatcher, app: App):
     model_inputs = tokenizer([text], return_tensors="pt").to("cuda")
     generated_ids = model.generate(**model_inputs, 
-                                   max_new_tokens=120, 
+                                   max_new_tokens=300, 
                                    num_beams=7, 
                                    no_repeat_ngram_size=2,
                                    early_stopping=True,
@@ -23,9 +23,6 @@ def get_bot_response(text: str, dispatcher: EventDispatcher, app: App):
     bot_response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     
     dispatcher.dispatch('on_bot_responded', bot_response, app)
-
-class ChatMessage(Label):
-    pass
 
 class BotEventDispatcher(EventDispatcher):
     def __init__(self, **kwargs):
