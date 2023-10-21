@@ -9,20 +9,12 @@ GridLayout:
         Label:
             id: chat
             size_hint: 1, 1
-            text_size: (self.width, None)
+            text_size: (self.width, self.height - 70)
             halign: 'left'
 
-    GridLayout:
-        size_hint_y: 1
-        rows: 1
-        cols: 2
+    TextInput:
+        on_text_validate: app.on_message_received(self.text); self.text = ''
+        size_hint_x: 1
+        id: message
+        multiline: False
 
-        TextInput:
-            on_text_validate: app.on_message_received(self.text); self.text = ''
-            size_hint_x: 4
-            id: message
-            multiline: False
-
-        Button:
-            size_hint_x: 1
-            text: '>'
