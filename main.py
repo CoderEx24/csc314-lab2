@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.event import EventDispatcher
+from kivy.uix.label import Label
 from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 import threading
@@ -17,13 +18,24 @@ def get_bot_response(text: str, dispatcher: EventDispatcher, app: App):
     
     dispatcher.dispatch('on_bot_responded', bot_response, app)
 
+class ChatMessage(Label):
+    pass
+
 class BotEventDispatcher(EventDispatcher):
     def __init__(self, **kwargs):
         self.register_event_type('on_bot_responded')
         super(EventDispatcher, self).__init__(**kwargs)
 
     def on_bot_responded(self, *args):
-        text = args[0]
+        new_text = args[0]
+        text_chunks = new_text.split(' ')
+        text = ''
+        for i, piece in enumerate(text_chunks):
+            if i % 10 == 0 and i > 0:
+                text += '\n'
+
+            text += piece + ' '
+
         app = args[1]
         app.root.ids['chat'].data.append({'text': f'Bot: {text}'})
 
