@@ -2,18 +2,25 @@ GridLayout:
     rows: 2
     cols: 1
 
-    Label:
+    RecycleView:
+        viewclass: 'Label'
         size_hint_y: 9
-        text: "test"
+        id: chat
+        
+        RecycleBoxLayout:
+            orientation: 'vertical'
 
     GridLayout:
         size_hint_y: 1
         rows: 1
         cols: 2
+
         TextInput:
+            on_text_validate: app.on_message_received(self.text); self.text = ''
             size_hint_x: 4
             id: 'message'
             multiline: False
+
         Button:
             size_hint_x: 1
             text: '>'
