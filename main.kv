@@ -8,6 +8,10 @@ GridLayout:
         id: chat
         
         RecycleBoxLayout:
+            default_size: None, dp(56)
+            default_size_hint: 1, None
+            size_hint_y: None
+            height: self.minimum_height
             orientation: 'vertical'
 
     GridLayout:
@@ -18,7 +22,7 @@ GridLayout:
         TextInput:
             on_text_validate: app.on_message_received(self.text); self.text = ''
             size_hint_x: 4
-            id: 'message'
+            id: message
             multiline: False
 
         Button:
