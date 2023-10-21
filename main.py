@@ -5,15 +5,21 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 import threading
 
+tokenizer = AutoTokenizer.from_pretrained("gpt2")
+
 model = AutoModelForCausalLM.from_pretrained(
-    "gpt2", device_map="auto", load_in_4bit=True
+    "gpt2", device_map="auto", load_in_4bit=True, pad_token_id=tokenizer.eos_token_id
 )
 
-tokenizer = AutoTokenizer.from_pretrained("gpt2")
 
 def get_bot_response(text: str, dispatcher: EventDispatcher, app: App):
     model_inputs = tokenizer([text], return_tensors="pt").to("cuda")
-    generated_ids = model.generate(**model_inputs, max_new_tokens=50)
+    generated_ids = model.generate(**model_inputs, 
+                                   max_new_tokens=70, 
+                                   num_beams=7, 
+                                   no_repeat_ngram_size=2,
+                                   early_stopping=True,
+                                   )
     bot_response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     
     dispatcher.dispatch('on_bot_responded', bot_response, app)
@@ -27,17 +33,16 @@ class BotEventDispatcher(EventDispatcher):
         super(EventDispatcher, self).__init__(**kwargs)
 
     def on_bot_responded(self, *args):
-        new_text = args[0]
-        text_chunks = new_text.split(' ')
+        text_arr = args[0].split(' ')
         text = ''
-        for i, piece in enumerate(text_chunks):
-            if i % 10 == 0 and i > 0:
+        for i, piece in enumerate(text_arr):
+            if i > 0 and i % 15 == 0:
                 text += '\n'
-
-            text += piece + ' '
+            text += f'{piece} '
 
         app = args[1]
         app.root.ids['chat'].data.append({'text': f'Bot: {text}'})
+        print(f'Bot Response:-\n\n{args[0]}\n\n')
 
 class MainApp(App):
 

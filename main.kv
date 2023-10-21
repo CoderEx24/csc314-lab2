@@ -1,12 +1,13 @@
 <ChatMessage>:
-    size_hint: 1, 1
+    valign: 'middle'
+    halign: 'bottom'
 
 GridLayout:
     rows: 2
     cols: 1
 
     RecycleView:
-        viewclass: 'ChatMessage'
+        viewclass: 'Label'
         size_hint_y: 9
         id: chat
         
