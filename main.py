@@ -15,7 +15,7 @@ model = AutoModelForCausalLM.from_pretrained(
 def get_bot_response(text: str, dispatcher: EventDispatcher, app: App):
     model_inputs = tokenizer([text], return_tensors="pt").to("cuda")
     generated_ids = model.generate(**model_inputs, 
-                                   max_new_tokens=70, 
+                                   max_new_tokens=120, 
                                    num_beams=7, 
                                    no_repeat_ngram_size=2,
                                    early_stopping=True,
@@ -41,7 +41,8 @@ class BotEventDispatcher(EventDispatcher):
             text += f'{piece} '
 
         app = args[1]
-        app.root.ids['chat'].data.append({'text': f'Bot: {text}'})
+        text = args[0]
+        app.root.ids['chat'].text += f'Bot: {text}\n\n'
         print(f'Bot Response:-\n\n{args[0]}\n\n')
 
 class MainApp(App):
@@ -49,7 +50,7 @@ class MainApp(App):
     bot_dispatcher = BotEventDispatcher()
     
     def on_message_received(self, text):
-        self.root.ids['chat'].data.append({'text': f'User: {text}'})
+        self.root.ids['chat'].text += f'User: {text}\n\n'
         
         bot_thread = threading.Thread(target=get_bot_response, args=(text, MainApp.bot_dispatcher, self))
         bot_thread.start()
